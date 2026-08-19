@@ -6,11 +6,12 @@ export default function ToolbarButton({ icon, active, onClick, disabled, title, 
       title={title}
       className={`term-btn inline-flex items-center justify-center shrink-0 ${className}`}
       style={{
-        padding: '8px 14px',
-        fontSize: 13,
-        minWidth: 40,
-        minHeight: 34,
+        padding: '9px 14px',
+        fontSize: 19.5,
+        minWidth: 39,
+        minHeight: 39,
         lineHeight: 1,
+        fontWeight: 700,
         letterSpacing: '0.5px',
         ...(active ? {
           background: 'var(--color-accent)',

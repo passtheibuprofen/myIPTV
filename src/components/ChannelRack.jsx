@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import ToolbarButton from './ToolbarButton';
 
-const ROW_HEIGHT = 40;
+const ROW_HEIGHT = 60;
 const OVERSCAN = 10;
 
 function ChannelRow({ channel, isActive, isFav, onClick, onToggleFav }) {
@@ -22,7 +22,7 @@ function ChannelRow({ channel, isActive, isFav, onClick, onToggleFav }) {
       }}
     >
       <span
-        className="shrink-0 w-8 text-center text-[13px]"
+        className="shrink-0 w-10 text-center text-[19.5px] font-normal"
         style={{
           color: isActive ? 'var(--color-bg)' : isFav ? 'var(--color-accent)' : 'var(--color-text-dim)',
           textShadow: isFav && !isActive ? '0 0 5px rgba(51,255,0,0.5)' : 'none',
@@ -32,14 +32,14 @@ function ChannelRow({ channel, isActive, isFav, onClick, onToggleFav }) {
       </span>
 
       <span
-        className="shrink-0 w-8 text-center text-[11px]"
+        className="shrink-0 w-10 text-center text-[16.5px] font-normal"
         style={{ color: isActive ? 'var(--color-bg)' : 'var(--color-text-dim)' }}
       >
         {channel.country || ''}
       </span>
 
       <span
-        className="flex-1 truncate text-[13px] px-2"
+        className="flex-1 truncate text-[14.625px] font-normal px-3"
         style={{
           color: isActive ? 'var(--color-bg)' : 'var(--color-text)',
           textShadow: isActive ? 'none' : '0 0 4px rgba(51,255,0,0.2)',
@@ -49,7 +49,7 @@ function ChannelRow({ channel, isActive, isFav, onClick, onToggleFav }) {
       </span>
 
       <span
-        className="shrink-0 text-[11px] px-3 truncate max-w-[140px]"
+        className="shrink-0 text-[16.5px] font-normal px-3 truncate max-w-[140px]"
         style={{ color: isActive ? 'var(--color-bg)' : 'var(--color-text-dim)' }}
       >
         {channel.category || ''}
@@ -57,7 +57,7 @@ function ChannelRow({ channel, isActive, isFav, onClick, onToggleFav }) {
 
       <button
         onClick={(e) => { e.stopPropagation(); onToggleFav(); }}
-        className="shrink-0 w-8 text-center text-[13px] cursor-pointer bg-transparent border-none"
+        className="shrink-0 w-10 text-center text-[19.5px] font-normal cursor-pointer bg-transparent border-none"
         style={{
           color: isActive ? 'var(--color-bg)' : isFav ? 'var(--color-accent)' : 'var(--color-text-dim)',
           textShadow: isFav && !isActive ? '0 0 5px rgba(51,255,0,0.5)' : 'none',
@@ -142,7 +142,7 @@ export default function ChannelRack({
       className="shrink-0 flex flex-col overflow-hidden fade-in"
       style={{ width: 400, borderLeft: '1px solid var(--color-border)', background: 'var(--color-bg)' }}
     >
-      <div style={{ borderBottom: '1px solid var(--color-border)', padding: '12px 14px' }}>
+      <div style={{ borderBottom: '1px solid var(--color-border)', padding: '14px 18px' }}>
         <div className="flex items-center gap-4">
           <ToolbarButton
             icon="/"
@@ -165,14 +165,14 @@ export default function ChannelRack({
 
           <span className="flex-1" />
 
-          <span className="text-[11px]" style={{ color: 'var(--color-text-dim)' }}>
+          <span className="text-[16.5px] font-bold" style={{ color: 'var(--color-text-dim)' }}>
             {filteredChannels.length.toLocaleString()}
           </span>
         </div>
 
         {showSearch && (
-          <div className="flex items-center gap-2 mt-5">
-            <span className="text-[13px]" style={{ color: 'var(--color-accent)' }}>$</span>
+          <div className="flex items-center gap-2 mt-4">
+            <span className="text-[19.5px] font-bold" style={{ color: 'var(--color-accent)' }}>$</span>
             <input
               ref={searchRef}
               type="text"
@@ -180,18 +180,18 @@ export default function ChannelRack({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="term-input flex-1"
-              style={{ fontSize: 13, padding: '7px 10px' }}
+              style={{ fontSize: 19.5, padding: '9px 12px', fontWeight: 700 }}
             />
           </div>
         )}
 
         {showFilters && (
-          <div className="flex gap-3 mt-5">
+          <div className="flex gap-3 mt-4">
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
               className="term-select flex-1 min-w-0"
-              style={{ padding: '6px 8px' }}
+              style={{ padding: '9px 12px', fontSize: 16.5, fontWeight: 700 }}
             >
               {categories.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
@@ -199,7 +199,7 @@ export default function ChannelRack({
               value={selectedCountry}
               onChange={(e) => setSelectedCountry(e.target.value)}
               className="term-select"
-              style={{ padding: '6px 8px', width: 80 }}
+              style={{ padding: '9px 12px', width: 90, fontSize: 16.5, fontWeight: 700 }}
             >
               {countries.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
@@ -209,7 +209,7 @@ export default function ChannelRack({
 
       <div ref={containerRef} className="flex-1 overflow-y-auto" onScroll={handleScroll}>
         {filteredChannels.length === 0 ? (
-          <div className="p-6 text-center text-[13px]" style={{ color: 'var(--color-text-dim)' }}>
+          <div className="p-6 text-center text-[19.5px] font-bold" style={{ color: 'var(--color-text-dim)' }}>
             {showFavoritesOnly ? 'no favorites' : 'no results'}
           </div>
         ) : (
