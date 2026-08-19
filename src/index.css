@@ -10,6 +10,7 @@
   --color-text-dim: rgba(51, 255, 0, 0.45);
   --color-border: rgba(51, 255, 0, 0.3);
   --color-danger: #ff3333;
+  --color-orange: #ff6600;
 
   --font-mono: 'IBM Plex Mono', 'Consolas', 'Courier New', monospace;
 }
@@ -178,4 +179,43 @@ body::after {
 
 .fade-in {
   animation: fadeIn 0.2s ease forwards;
+}
+
+.vol-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 3px;
+  background: var(--color-orange-faint);
+  outline: none;
+  cursor: pointer;
+}
+
+.vol-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 8px;
+  height: 14px;
+  background: var(--color-orange);
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 0 5px rgba(255,102,0,0.4);
+}
+
+.vol-slider::-moz-range-thumb {
+  width: 8px;
+  height: 14px;
+  background: var(--color-orange);
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 0 5px rgba(255,102,0,0.4);
+}
+
+.vol-slider::-webkit-slider-runnable-track {
+  height: 3px;
+  background: var(--color-orange-faint);
+}
+
+.vol-slider::-moz-range-track {
+  height: 3px;
+  background: var(--color-orange-faint);
 }

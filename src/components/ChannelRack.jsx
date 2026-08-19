@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
+import ToolbarButton from './ToolbarButton';
 
 const ROW_HEIGHT = 40;
 const OVERSCAN = 10;
@@ -14,14 +15,10 @@ function ChannelRow({ channel, isActive, isFav, onClick, onToggleFav }) {
         color: isActive ? 'var(--color-bg)' : 'var(--color-text)',
       }}
       onMouseEnter={(e) => {
-        if (!isActive) {
-          e.currentTarget.style.background = 'var(--color-accent-dim)';
-        }
+        if (!isActive) e.currentTarget.style.background = 'var(--color-accent-dim)';
       }}
       onMouseLeave={(e) => {
-        if (!isActive) {
-          e.currentTarget.style.background = 'transparent';
-        }
+        if (!isActive) e.currentTarget.style.background = 'transparent';
       }}
     >
       <span
@@ -104,49 +101,34 @@ export default function ChannelRack({
 
   const filteredChannels = useMemo(() => {
     let list = channels;
-    if (showFavoritesOnly) {
-      list = list.filter(c => isFavorite(c.id));
-    }
+    if (showFavoritesOnly) list = list.filter(c => isFavorite(c.id));
     if (search) {
       const q = search.toLowerCase();
       list = list.filter(c => c.name.toLowerCase().includes(q));
     }
-    if (selectedCategory !== 'All') {
-      list = list.filter(c => c.category === selectedCategory);
-    }
-    if (selectedCountry !== 'All') {
-      list = list.filter(c => c.country === selectedCountry);
-    }
+    if (selectedCategory !== 'All') list = list.filter(c => c.category === selectedCategory);
+    if (selectedCountry !== 'All') list = list.filter(c => c.country === selectedCountry);
     return list;
   }, [channels, search, selectedCategory, selectedCountry, showFavoritesOnly, isFavorite]);
 
   useEffect(() => {
     const el = containerRef.current?.parentElement;
     if (!el) return;
-    const obs = new ResizeObserver(([entry]) => {
-      setContainerHeight(entry.contentRect.height);
-    });
+    const obs = new ResizeObserver(([entry]) => setContainerHeight(entry.contentRect.height));
     obs.observe(el);
     return () => obs.disconnect();
   }, []);
 
   useEffect(() => {
-    if (showSearch && searchRef.current) {
-      searchRef.current.focus();
-    }
+    if (showSearch && searchRef.current) searchRef.current.focus();
   }, [showSearch]);
 
   const totalHeight = filteredChannels.length * ROW_HEIGHT;
   const startIndex = Math.max(0, Math.floor(scrollTop / ROW_HEIGHT) - OVERSCAN);
-  const endIndex = Math.min(
-    filteredChannels.length,
-    Math.ceil((scrollTop + containerHeight) / ROW_HEIGHT) + OVERSCAN
-  );
+  const endIndex = Math.min(filteredChannels.length, Math.ceil((scrollTop + containerHeight) / ROW_HEIGHT) + OVERSCAN);
   const visibleChannels = filteredChannels.slice(startIndex, endIndex);
 
-  const handleScroll = useCallback((e) => {
-    setScrollTop(e.target.scrollTop);
-  }, []);
+  const handleScroll = useCallback((e) => setScrollTop(e.target.scrollTop), []);
 
   useEffect(() => {
     if (containerRef.current) {
@@ -155,60 +137,31 @@ export default function ChannelRack({
     }
   }, [search, selectedCategory, selectedCountry, showFavoritesOnly]);
 
-  const iconBtnStyle = {
-    padding: '6px 8px',
-    fontSize: 14,
-    minWidth: 32,
-    textAlign: 'center',
-  };
-
-  const activeIconStyle = {
-    ...iconBtnStyle,
-    background: 'var(--color-accent)',
-    color: 'var(--color-bg)',
-    borderColor: 'var(--color-accent)',
-  };
-
   return (
     <div
       className="shrink-0 flex flex-col overflow-hidden fade-in"
-      style={{
-        width: 400,
-        borderLeft: '1px solid var(--color-border)',
-        background: 'var(--color-bg)',
-      }}
+      style={{ width: 400, borderLeft: '1px solid var(--color-border)', background: 'var(--color-bg)' }}
     >
-      <div style={{ borderBottom: '1px solid var(--color-border)', padding: '10px 12px' }}>
-        <div className="flex items-center gap-2">
-          <button
+      <div style={{ borderBottom: '1px solid var(--color-border)', padding: '12px 14px' }}>
+        <div className="flex items-center gap-4">
+          <ToolbarButton
+            icon="/"
+            active={showSearch}
             onClick={() => { setShowSearch(s => !s); if (showSearch) setSearch(''); }}
-            className="term-btn"
-            style={showSearch ? activeIconStyle : iconBtnStyle}
             title="Search"
-          >
-            ⌕
-          </button>
-
-          <button
+          />
+          <ToolbarButton
+            icon="+"
+            active={showFilters}
             onClick={() => setShowFilters(s => !s)}
-            className="term-btn"
-            style={showFilters ? activeIconStyle : iconBtnStyle}
             title="Filters"
-          >
-            ⚙
-          </button>
-
-          <button
+          />
+          <ToolbarButton
+            icon="*"
+            active={showFavoritesOnly}
             onClick={onToggleFavoritesOnly}
-            className="term-btn"
-            style={{
-              ...iconBtnStyle,
-              ...(showFavoritesOnly ? { background: 'var(--color-accent)', color: 'var(--color-bg)', borderColor: 'var(--color-accent)' } : {}),
-            }}
             title="Favorites"
-          >
-            ★
-          </button>
+          />
 
           <span className="flex-1" />
 
@@ -218,7 +171,7 @@ export default function ChannelRack({
         </div>
 
         {showSearch && (
-          <div className="flex items-center gap-2 mt-3">
+          <div className="flex items-center gap-2 mt-5">
             <span className="text-[13px]" style={{ color: 'var(--color-accent)' }}>$</span>
             <input
               ref={searchRef}
@@ -233,16 +186,14 @@ export default function ChannelRack({
         )}
 
         {showFilters && (
-          <div className="flex gap-2 mt-3">
+          <div className="flex gap-3 mt-5">
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
               className="term-select flex-1 min-w-0"
               style={{ padding: '6px 8px' }}
             >
-              {categories.map(c => (
-                <option key={c} value={c}>{c}</option>
-              ))}
+              {categories.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
             <select
               value={selectedCountry}
@@ -250,19 +201,13 @@ export default function ChannelRack({
               className="term-select"
               style={{ padding: '6px 8px', width: 80 }}
             >
-              {countries.map(c => (
-                <option key={c} value={c}>{c}</option>
-              ))}
+              {countries.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
         )}
       </div>
 
-      <div
-        ref={containerRef}
-        className="flex-1 overflow-y-auto"
-        onScroll={handleScroll}
-      >
+      <div ref={containerRef} className="flex-1 overflow-y-auto" onScroll={handleScroll}>
         {filteredChannels.length === 0 ? (
           <div className="p-6 text-center text-[13px]" style={{ color: 'var(--color-text-dim)' }}>
             {showFavoritesOnly ? 'no favorites' : 'no results'}
@@ -272,12 +217,7 @@ export default function ChannelRack({
             {visibleChannels.map((channel, i) => (
               <div
                 key={channel.id}
-                style={{
-                  position: 'absolute',
-                  top: (startIndex + i) * ROW_HEIGHT,
-                  left: 0,
-                  right: 0,
-                }}
+                style={{ position: 'absolute', top: (startIndex + i) * ROW_HEIGHT, left: 0, right: 0 }}
               >
                 <ChannelRow
                   channel={channel}
