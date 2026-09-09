@@ -1,9 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import VideoPlayer from './components/VideoPlayer';
 import ChannelRack from './components/ChannelRack';
+import NowPlayingBar from './components/NowPlayingBar';
 import { useChannels } from './hooks/useChannels';
 import { useFavorites } from './hooks/useFavorites';
 import { usePlayer } from './hooks/usePlayer';
+
+const BREAKPOINT = 768;
 
 export default function App() {
   const { channels, loading, error, refetch } = useChannels();
@@ -17,6 +20,19 @@ export default function App() {
   } = usePlayer();
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [showSidebar, setShowSidebar] = useState(true);
+  const [onAirChannels, setOnAirChannels] = useState(new Set());
+  const [gridView, setGridView] = useState(false);
+  const [isStacked, setIsStacked] = useState(window.innerWidth < BREAKPOINT);
+
+  useEffect(() => {
+    const onResize = () => setIsStacked(window.innerWidth < BREAKPOINT);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  const markOnAir = useCallback((channelId) => {
+    setOnAirChannels(prev => new Set([...prev, channelId]));
+  }, []);
 
   const handleSelectChannel = useCallback((channel) => {
     playChannel(channel);
@@ -61,38 +77,108 @@ export default function App() {
   }, [channels, currentChannel, playChannel]);
 
   return (
-    <div className="h-full flex overflow-hidden">
+    <div className="h-full flex flex-col overflow-hidden">
       {error && (
-        <div
-          className="fixed top-0 left-0 right-0 z-50 px-4 py-2 text-[12px] fade-in"
-          style={{ color: 'var(--color-danger)', background: 'var(--color-bg)', borderBottom: '1px solid var(--color-danger)' }}
-        >
-          ERR: {error}
+        <div className="fixed top-0 left-0 right-0 z-50 px-4 py-2 text-[13px] fade-in bg-red-900/90 text-white">
+          {error}
         </div>
       )}
 
-      <VideoPlayer
+      <div
+        className="flex-1 overflow-hidden"
+        style={{
+          display: 'flex',
+          flexDirection: isStacked ? 'column' : 'row',
+        }}
+      >
+        {isStacked ? (
+          <>
+            <div
+              style={{
+                flex: '0 0 auto',
+                minHeight: 0,
+                width: '100%',
+                aspectRatio: '16 / 9',
+                maxHeight: '60vh',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'stretch',
+              }}
+            >
+              <VideoPlayer
+                channel={currentChannel}
+                onError={handleError}
+                onReconnect={handleReconnect}
+                onMarkOnAir={markOnAir}
+                reconnectAttempt={reconnectAttempt}
+                channelCount={channels.length}
+                loadingCount={loading}
+                onRefresh={refetch}
+                showSidebar={showSidebar}
+                onToggleSidebar={() => setShowSidebar(s => !s)}
+              />
+            </div>
+
+            {showSidebar && (
+              <div style={{ flex: '1 1 auto', minHeight: 0, overflow: 'hidden' }}>
+                <ChannelRack
+                  channels={channels}
+                  currentChannel={currentChannel}
+                  isFavorite={isFavorite}
+                  onToggleFavorite={toggleFavorite}
+                  onSelectChannel={handleSelectChannel}
+                  showFavoritesOnly={showFavoritesOnly}
+                  onToggleFavoritesOnly={() => setShowFavoritesOnly(f => !f)}
+                  onAirChannels={onAirChannels}
+                  gridView={gridView}
+                  onToggleGridView={() => setGridView(g => !g)}
+                  loading={loading}
+                  isStacked
+                />
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            {showSidebar && (
+              <ChannelRack
+                channels={channels}
+                currentChannel={currentChannel}
+                isFavorite={isFavorite}
+                onToggleFavorite={toggleFavorite}
+                onSelectChannel={handleSelectChannel}
+                showFavoritesOnly={showFavoritesOnly}
+                onToggleFavoritesOnly={() => setShowFavoritesOnly(f => !f)}
+                onAirChannels={onAirChannels}
+                gridView={gridView}
+                onToggleGridView={() => setGridView(g => !g)}
+                loading={loading}
+                isStacked={false}
+              />
+            )}
+
+            <VideoPlayer
+              channel={currentChannel}
+              onError={handleError}
+              onReconnect={handleReconnect}
+              onMarkOnAir={markOnAir}
+              reconnectAttempt={reconnectAttempt}
+              channelCount={channels.length}
+              loadingCount={loading}
+              onRefresh={refetch}
+              showSidebar={showSidebar}
+              onToggleSidebar={() => setShowSidebar(s => !s)}
+            />
+          </>
+        )}
+      </div>
+
+      <NowPlayingBar
         channel={currentChannel}
-        onError={handleError}
-        onReconnect={handleReconnect}
-        reconnectAttempt={reconnectAttempt}
-        channelCount={channels.length}
-        loadingCount={loading}
-        onRefresh={refetch}
-        showSidebar={showSidebar}
+        isOnAir={currentChannel ? onAirChannels.has(currentChannel.id) : false}
         onToggleSidebar={() => setShowSidebar(s => !s)}
+        showSidebar={showSidebar}
       />
-      {showSidebar && (
-        <ChannelRack
-          channels={channels}
-          currentChannel={currentChannel}
-          isFavorite={isFavorite}
-          onToggleFavorite={toggleFavorite}
-          onSelectChannel={handleSelectChannel}
-          showFavoritesOnly={showFavoritesOnly}
-          onToggleFavoritesOnly={() => setShowFavoritesOnly(f => !f)}
-        />
-      )}
     </div>
   );
 }
