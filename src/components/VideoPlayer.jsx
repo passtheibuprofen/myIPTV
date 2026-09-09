@@ -183,14 +183,7 @@ export default function VideoPlayer({
               </svg>
             </div>
             <p className="text-[15px] font-bold mb-1" style={{ color: '#fff' }}>{error}</p>
-            <p className="text-[13px] mb-3" style={{ color: '#b3b3b3' }}>{channel.name}</p>
-            <button
-              onClick={onRefresh}
-              className="rounded-full px-5 py-2 text-[13px] font-semibold"
-              style={{ background: '#1DB954', color: '#000', border: 'none', cursor: 'pointer' }}
-            >
-              Try again
-            </button>
+            <p className="text-[13px]" style={{ color: '#b3b3b3' }}>{channel.name}</p>
           </div>
         </div>
       )}
